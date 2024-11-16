@@ -1,6 +1,8 @@
 data {
   int<lower=0> T;  // Number of observations
   vector[T] y;     // Returns data
+  int prior_mean_mu; // Mean of our daily returns, we use this for building informative prior
+  int prior_sd_mu; // Standard deviation of our daily returns, we use this for building informative prior
 }
 
 parameters {
@@ -13,9 +15,11 @@ model {
   vector[T] h;  // Conditional variances
   
   // Priors
-  mu ~ normal(0, 0.1); // update to an informative prior
-  alpha0 ~ normal(0, 0.1); // alpha0 we don't really know
-  alpha1 ~ beta(2, 2); // alpha1 we don't really know
+  mu ~ normal(prior_mean_mu, 1.5 * prior_sd_mu); // informative prior selection
+
+  //https://www.shs-conferences.org/articles/shsconf/pdf/2023/18/shsconf_fems2023_01077.pdf
+  alpha0 ~ normal(0, 0.05); // weakly informative prior
+  alpha1 ~ beta(2, 3.5); // weakly informative prior
   
   // ARCH(1) model
   h[1] = alpha0;
