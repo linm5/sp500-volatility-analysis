@@ -43,7 +43,7 @@ plt.title("S&P 500 Close Prices")
 plt.xlabel("Date")
 plt.ylabel("Close Price")
 plt.legend()
-plt.savefig("../BDA_project/S&P500_Close_Prices.png")  # Save the figure
+plt.savefig("../BDA_project/s&p500_close_prices.png")  
 plt.show()
 
 # Visualize the Daily Returns and save the plot
@@ -53,8 +53,7 @@ plt.title("S&P 500 Daily Returns")
 plt.xlabel("Date")
 plt.ylabel("Daily Log Returns")
 plt.legend()
-plt.savefig("../BDA_project/S&P500_Daily_Returns.png")  # Save the figure
+plt.savefig("../BDA_project/s&p500_daily_log_returns.png")  
 plt.show()
 
-# Display cleaned data
 print(data_cleaned.head())
