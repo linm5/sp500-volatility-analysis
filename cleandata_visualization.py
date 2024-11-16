@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 # Load the dataset (update file path as needed)
-file_path = "/Users/meishanlin/BDA_project/BDA_project/Price_History_20241108.csv"
+file_path = "../BDA_project/s&p_500_10_year_raw.csv"
 raw_data = pd.read_csv(file_path, header=None)
 
 # Inspect the first few rows
@@ -28,13 +28,13 @@ data_cleaned = data_cleaned.dropna()
 
 # Calculate daily log returns for ARCH modeling
 data_cleaned = data_cleaned.sort_values(by="Exchange_Date")
-data_cleaned["Daily_Returns"] = np.log(data_cleaned["Close"] / data_cleaned["Close"].shift(1))
+data_cleaned["Log_Returns"] = np.log(data_cleaned["Close"] / data_cleaned["Close"].shift(1))
 
 # Drop the first row with NA Daily_Returns
 data_cleaned = data_cleaned.dropna()
 
 # Save the cleaned data to a new CSV file
-data_cleaned.to_csv("Cleaned_S&P500_Data.csv", index=False)
+data_cleaned.to_csv("cleaned_s&p_500_data.csv", index=False)
 
 # Visualize the Close prices and save the plot
 plt.figure(figsize=(10, 6))
@@ -43,17 +43,17 @@ plt.title("S&P 500 Close Prices")
 plt.xlabel("Date")
 plt.ylabel("Close Price")
 plt.legend()
-plt.savefig("/Users/meishanlin/BDA_project/BDA_project/S&P500_Close_Prices.png")  # Save the figure
+plt.savefig("../BDA_project/S&P500_Close_Prices.png")  # Save the figure
 plt.show()
 
 # Visualize the Daily Returns and save the plot
 plt.figure(figsize=(10, 6))
-plt.plot(data_cleaned["Exchange_Date"], data_cleaned["Daily_Returns"], label="Daily Returns", color="red")
+plt.plot(data_cleaned["Exchange_Date"], data_cleaned["Log_Returns"], label="Log Returns", color="red")
 plt.title("S&P 500 Daily Returns")
 plt.xlabel("Date")
-plt.ylabel("Daily Returns")
+plt.ylabel("Daily Log Returns")
 plt.legend()
-plt.savefig("/Users/meishanlin/BDA_project/BDA_project/S&P500_Daily_Returns.png")  # Save the figure
+plt.savefig("../BDA_project/S&P500_Daily_Returns.png")  # Save the figure
 plt.show()
 
 # Display cleaned data
