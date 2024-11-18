@@ -5,7 +5,6 @@ if (!require(cmdstanr)) {
   install.packages("cmdstanr", repos = c("https://mc-stan.org/r-packages/", getOption("repos")))
   library(cmdstanr)
 }
-
 # ------------------------
 # Check and Install CmdStan
 # ------------------------
@@ -42,7 +41,7 @@ log_return_sd <- sd(data$Log_Returns, na.rm = TRUE)
 # ------------------------
 # Compile the Stan Model
 # ------------------------
-stan_model_path <- "garch_model2.stan"
+stan_model_path <- "garch_model.stan"
 garch_model <- cmdstan_model(stan_model_path)
 
 
