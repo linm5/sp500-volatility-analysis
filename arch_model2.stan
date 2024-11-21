@@ -16,8 +16,8 @@ model {
   
   // Priors
   mu ~ normal(prior_mean_mu, prior_sd_mu); // Informative prior for mean
-  alpha0 ~ normal(0.1, 0.05);             // Base volatility prior
-  alpha1 ~ beta(2, 5);                    // ARCH parameter prior
+  alpha0 ~ normal(0.1, 0.05);             // Base volatility prior/weakly informative prior
+  alpha1 ~ beta(2, 5);                    // ARCH parameter prior/ informative prior
   
   // ARCH(1) model
   h[1] = alpha0 / (1 - alpha1); // Stationary variance initialization
@@ -44,3 +44,5 @@ generated quantities {
     y_rep[t] = normal_rng(mu, volatility[t]);  // Generate predictive samples
   }
 }
+
+

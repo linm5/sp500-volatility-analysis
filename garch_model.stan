@@ -21,10 +21,10 @@ transformed parameters {
 }
 model {
   // Priors
-  mu ~ normal(0, 1);
-  alpha0 ~ normal(0, 1);
-  alpha1 ~ beta(2, 5);       // Typical prior for GARCH coefficients
-  beta1 ~ beta(5, 2);
+  mu ~ normal(0, 1); //Weakly informative
+  alpha0 ~ normal(0, 1); //Weakly informative not strong informative.
+  alpha1 ~ beta(2, 5);       // Typical prior for GARCH coefficients/ informative
+  beta1 ~ beta(5, 2); //informative
   // Likelihood
   for (n in 1:N) {
     target += normal_lpdf(y[n] | mu, sqrt(sigma2[n]));

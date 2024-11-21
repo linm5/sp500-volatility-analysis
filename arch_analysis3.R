@@ -13,7 +13,6 @@ if (!require(cmdstanr)) {
 if (!require(bayesplot)) install.packages("bayesplot")
 library(bayesplot)
 
-# Ensure CmdStan is installed
 cmdstan_installed <- function() {
   res <- try(out <- cmdstanr::cmdstan_path(), silent = TRUE)
   !inherits(res, "try-error")
@@ -38,13 +37,9 @@ stan_data <- list(
 )
 
 # Compile Stan Model
-arch_model <- cmdstan_model("../BDA_project/arch_model2.stan", force_recompile = TRUE, quiet = FALSE)
+arch_model <- cmdstan_model("../BDA_project/arch_model3.stan", force_recompile = TRUE, quiet = FALSE)
 
-
-
-
-# 6.Command Used for MCMC Inference:
-# Fit Model
+# Command Used for MCMC Inference
 fit <- arch_model$sample(
   data = stan_data,
   seed = 4911, # Ensures reproducibility
@@ -63,11 +58,10 @@ cat("- `iter_warmup`: Number of warm-up iterations\n")
 cat("- `iter_sampling`: Number of iterations for sampling the posterior\n")
 cat("- `refresh`: Frequency of progress updates\n\n")
 
-
-# 7. Convergence diagnostic (R hat, ESS, divergences) 
-# Compute Diagnostics
+# Convergence Diagnostic
 fit_summary <- fit$summary()
 cat("Convergence Diagnostics:\n")
+
 rhat <- fit_summary$rhat
 ess_bulk <- fit_summary$ess_bulk
 ess_tail <- fit_summary$ess_tail
@@ -83,20 +77,32 @@ cat("Tail ESS:\n")
 print(ess_tail)
 cat("Interpretation: High ESS values indicate effective sampling. Low values suggest poor mixing.\n\n")
 
-# Handle Non-Convergence
-if (any(rhat > 1.1) || any(ess_bulk < 100)) {
-  cat("Warning: Non-convergence detected. Consider the following strategies:\n")
-  cat("- Increase iterations (`iter_warmup`, `iter_sampling`).\n")
-  cat("- Reparameterize the model to improve sampling efficiency.\n")
-  cat("- Check prior distributions for better constraints.\n")
+# Convergence Check
+# if (any(rhat > 1.1) || any(ess_bulk < 100, na.rm = TRUE)) {
+  # cat("Warning: Convergence diagnostics indicate potential issues.\n")
+# } else {
+  # cat("Diagnostics indicate good convergence.\n")
+# }
+
+# Save Diagnostics Summary
+write.csv(fit_summary, "diagnostics_summary.csv", row.names = FALSE)
+
+# Visualization of R-hat and ESS
+plot(rhat, type = "h", main = "R-hat Diagnostics", ylab = "R-hat")
+plot(ess_bulk, type = "h", main = "Bulk ESS", ylab = "ESS (Bulk)")
+plot(ess_tail, type = "h", main = "Tail ESS", ylab = "ESS (Tail)")
+
+# Posterior Predictive Checks
+if (!"y_rep" %in% fit$metadata()$variables) {
+  stop("The 'y_rep' variable is not present in the model. Check the 'generated quantities' block in the .stan file.")
 }
 
-
-# 8. Posterior predictive checks
-# Extract Posterior Predictive Samples
 y_rep <- fit$draws("y_rep", format = "matrix")
 
-# Posterior Predictive Check
+if (ncol(y_rep) != length(data$Log_Returns)) {
+  stop("Mismatch between dimensions of y_rep and observed data. Check the Stan model or extraction.")
+}
+
 cat("Posterior Predictive Check:\n")
 ppc <- ppc_dens_overlay(data$Log_Returns, y_rep)
 print(ppc)
@@ -108,17 +114,6 @@ cat("- Possible improvements:\n")
 cat("  - Revise the model's likelihood or priors.\n")
 cat("  - Add or remove parameters to better capture data behavior.\n")
 
-
-# Handling Model Misspecification; model Misspecification
-cat("Handling Misspecification:\n")
-cat("- If posterior predictive checks indicate poor fit:\n")
-cat("  - Review the model assumptions (e.g., Gaussian likelihood).\n")
-cat("  - Consider alternative priors based on domain knowledge.\n")
-cat("  - Increase the flexibility of the model, such as including hierarchical parameters or interaction terms.\n")
-
-
-
-
 # Diagnostics
 cat("Diagnostics Output:\n")
 fit_diagnostics <- fit$cmdstan_diagnose()
@@ -129,10 +124,6 @@ cat("Posterior Summary:\n")
 posterior_summary <- fit$summary()
 print(posterior_summary)
 
-# Check Convergence with Trace Plot
+# Trace Plot
 cat("Trace Plot:\n")
 mcmc_trace(fit$draws(), pars = c("mu", "alpha0", "alpha1"))
-
-
-
-
