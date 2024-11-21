@@ -34,15 +34,21 @@ model {
 generated quantities {
   vector[T] volatility;
   vector[T] y_rep;  // Posterior predictive samples
+  vector[T] log_lik; // Log-likelihood for LOO-CV
 
+  // Compute volatility (conditional standard deviations)
   volatility[1] = sqrt(alpha0 / (1 - alpha1));
   for (t in 2:T) {
     volatility[t] = sqrt(fmax(alpha0 + alpha1 * square(y[t-1] - mu), 1e-8));
   }
 
+  // Generate predictive samples
   for (t in 1:T) {
-    y_rep[t] = normal_rng(mu, volatility[t]);  // Generate predictive samples
+    y_rep[t] = normal_rng(mu, volatility[t]);
+  }
+
+  // Compute log-likelihood
+  for (t in 1:T) {
+    log_lik[t] = normal_lpdf(y[t] | mu, volatility[t]);
   }
 }
-
-
