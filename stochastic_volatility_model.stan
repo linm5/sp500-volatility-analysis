@@ -21,7 +21,7 @@ transformed parameters {
 
 model {
     // Priors
-    mu ~ normal(prior_mean_mu, 1.5 * prior_sd_mu); // informative prior selection for mean return
+    mu ~ normal(0, 1); // informative prior selection for mean return
     phi ~ uniform(-1, 1);        // Prior for AR1 coefficient
     sigma_vol ~ cauchy(0, 10);    // Half-Cauchy prior for volatility of volatility
     

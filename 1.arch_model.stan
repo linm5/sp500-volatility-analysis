@@ -12,10 +12,18 @@ parameters {
 }
 
 model {
-  vector[T] h;  // Conditional variances
+  vector[T] h;  // Conditional variances - log volatilities
   
   // Priors
-  mu ~ normal(prior_mean_mu, prior_sd_mu); // Informative prior for mean
+
+  // INFORMATIVE PRIORS - CORRECT ONES DON'T DELETE:
+  // mu ~ normal(prior_mean_mu, 1.5 * prior_sd_mu); // Informative prior for mean
+  // alpha0 ~ normal(0.1, 0.05);             // Base volatility prior/weakly informative prior
+  // alpha1 ~ beta(2, 5);                    // ARCH parameter prior/ informative prior
+  // https://www.shs-conferences.org/articles/shsconf/pdf/2023/18/shsconf_fems2023_01077.pdf
+  // Scale parameter error can be ignored!
+
+  mu ~ normal(prior_mean_mu, 1.5 * prior_sd_mu); // Informative prior for mean
   alpha0 ~ normal(0.1, 0.05);             // Base volatility prior/weakly informative prior
   alpha1 ~ beta(2, 5);                    // ARCH parameter prior/ informative prior
   

@@ -29,10 +29,16 @@ data <- read.csv("cleaned_s&p_500_data.csv")
 # Check for missing or invalid data
 if (any(is.na(data$Log_Returns))) stop("Missing values detected in Log_Returns")
 
+# Calculate Mean and SD for Priors
+log_return_mean <- mean(data$Log_Returns, na.rm = TRUE)
+log_return_sd <- sd(data$Log_Returns, na.rm = TRUE)
+
 # Prepare Data for GARCH Model
 stan_data <- list(
   N = nrow(data),
-  y = data$Log_Returns
+  y = data$Log_Returns,
+  prior_mean_mu = log_return_mean,
+  prior_sd_mu = log_return_sd
 )
 
 # Compile Stan Model
