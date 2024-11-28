@@ -103,7 +103,7 @@ prior_posterior_plot <- ggplot(df, aes(x = x, y = density, color = distribution)
   theme_minimal()
 ggsave("6.GARCH_prior_posterior_sensitivity.png", prior_posterior_plot)
 
-# LOO-CV for Model Comparison
+# LOO-CV for Model Comparison -> this still need to be modified. 
 log_lik <- fit$draws("log_lik", format = "matrix")
 loo_result <- loo(log_lik)
 cat("LOO-CV Result:\n")
