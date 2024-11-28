@@ -8,8 +8,8 @@ data {
 parameters {
   real mu;                 // Mean of the returns
   real<lower=0> alpha0;    // Constant term in the GARCH model
-  real<lower=0> alpha1;    // Coefficient for lagged squared residuals
-  real<lower=0> beta1;     // Coefficient for lagged conditional variance
+  real<lower=0, upper=1> alpha1;    // Coefficient for lagged squared residuals
+  real<lower=0, upper=1> beta1;     // Coefficient for lagged conditional variance
 }
 
 transformed parameters {
@@ -17,10 +17,11 @@ transformed parameters {
   
   // Initialize the first conditional variance
   volatility[1] = alpha0 / (1.0 - alpha1 - beta1);  // Stationary assumption
-  
+  volatility[1] = sqrt(fmax(volatility[1], 1e-8));  // Ensure positivity
+
   // Calculate the conditional variances
   for (n in 2:N) {
-    volatility[n] = alpha0 + alpha1 * square(y[n-1] - mu) + beta1 * volatility[n-1];
+    volatility[n] = alpha0 + alpha1 * square(y[n-1] - mu) + beta1 * square(volatility[n-1]);
     volatility[n] = sqrt(fmax(volatility[n], 1e-8));          // Ensure positivity
   }
 }
