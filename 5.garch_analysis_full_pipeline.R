@@ -1,4 +1,12 @@
 # Required Libraries
+
+# Step 1: Create user library directory
+dir.create(path = "~/R/library", recursive = TRUE, showWarnings = FALSE)
+
+# Step 2: Set user library path
+.libPaths(c("~/R/library", .libPaths()))
+
+
 if (!require(tidybayes)) install.packages("tidybayes")
 library(tidybayes)
 
@@ -15,6 +23,11 @@ library(bayesplot)
 
 if (!require(loo)) install.packages("loo")
 library(loo)
+
+if (!require(stringi)) {
+  install.packages("stringi", lib = "~/R/library", repos = "https://cran.rstudio.com/")
+}
+library(stringi)
 
 # Ensure CmdStan is installed
 cmdstan_installed <- function() {
