@@ -57,8 +57,6 @@ prior_sd_mu = log_return_sd
 # Compile Stan Model
 stochastic_volatility_model <- cmdstan_model("../BDA_project/stochastic_volatility_model.stan", force_recompile = TRUE, quiet = FALSE)
 
-
-
 # Explanation of MCMC options
 cat("MCMC Inference:\n")
 cat("- The model was run with 4 chains, each with 1000 warmup iterations and 2000 post-warmup iterations.\n")
