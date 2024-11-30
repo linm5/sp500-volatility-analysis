@@ -13,17 +13,24 @@ parameters {
 }
 
 transformed parameters {
-    vector[N] sigma;         // Volatilities (exponential of log-volatilities)
+    vector[N] volatility;         // Volatilities (exponential of log-volatilities)
     
     // Convert log-volatilities to volatilities
-    sigma = exp(h / 2);
+    volatility = exp(h / 2);
 }
 
 model {
     // Priors
-    mu ~ normal(0, 1); // informative prior selection for mean return
-    phi ~ uniform(-1, 1);        // Prior for AR1 coefficient
-    sigma_vol ~ cauchy(0, 10);    // Half-Cauchy prior for volatility of volatility
+    // INFORMATIVE PRIORS - CORRECT ONES DON'T DELETE:
+    // mu ~ normal(prior_mean_mu, 1.5 * prior_sd_mu);   // Informative prior for mean
+    // phi ~ normal(0.75, 0.1);;                            // Base volatility prior/weakly informative prior
+    // sigma_vol ~ cauchy(0, 0.25);                       // ARCH parameter prior/ informative prior
+    // https://www.shs-conferences.org/articles/shsconf/pdf/2023/18/shsconf_fems2023_01077.pdf
+    // Scale parameter error can be ignored!
+     
+    mu ~ normal(prior_mean_mu, 1.5 * prior_sd_mu); // informative prior selection for mean return
+    phi ~ normal(0.75, 0.1);        // Prior for AR1 coefficient
+    sigma_vol ~ cauchy(0, 0.25);    // Half-Normal prior for volatility of volatility
     
     // AR(1) process for log-volatilities
     h[1] ~ normal(mu, sigma_vol / sqrt(1 - phi * phi));
