@@ -41,7 +41,7 @@ stan_data <- list(
 )
 
 # Compile Stan Model
-arch_model <- cmdstan_model("../BDA_project/1.arch_model.stan", force_recompile = TRUE, quiet = FALSE)
+arch_model <- cmdstan_model("../BDA_project/1.2.arch_priors2.stan", force_recompile = TRUE, quiet = FALSE)
 
 # Explanation of MCMC options
 cat("MCMC Inference:\n")
@@ -79,7 +79,7 @@ if (sum(divergences) > 0) {
 y_rep <- fit$draws("y_rep", format = "matrix")
 ppc <- ppc_dens_overlay(data$Log_Returns, y_rep)
 print(ppc)
-ggsave("3.ARCH_posterior_predictive_check.png", plot = ppc)
+ggsave("3.2.arch_posterior_predictive_check_priors2.png", plot = ppc)
 
 # Prior Sensitivity Analysis
 priors <- list(c(2, 2), c(5, 5), c(10, 1))
