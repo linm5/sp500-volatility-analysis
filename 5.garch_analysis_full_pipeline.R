@@ -120,7 +120,7 @@ prior_posterior_plot <- ggplot(df, aes(x = x, y = density, color = distribution)
   facet_wrap(~ prior, scales = "fixed", nrow = 3) +
   labs(title = "Prior and Posterior Densities", x = expression(theta), y = "Density") +
   theme_minimal()
-ggsave("6.GARCH_prior_posterior_sensitivity.png", prior_posterior_plot)
+# ggsave("6.GARCH_prior_posterior_sensitivity.png", prior_posterior_plot)
 
 # LOO-CV for Model Comparison -> this still need to be modified. 
 log_lik <- fit$draws("log_lik", format = "matrix")
