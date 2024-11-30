@@ -95,7 +95,7 @@ if (sum(divergences) > 0) {
 y_rep <- fit$draws("y_rep", format = "matrix")
 ppc <- ppc_dens_overlay(data$Log_Returns, y_rep)
 print(ppc)
-ggsave("6.GARCH_posterior_predictive_check.png", plot = ppc)
+ggsave("6.0.garch_posterior_predictive_check_original.png", plot = ppc)
 
 # Prior Sensitivity Analysis
 priors <- list(

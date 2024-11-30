@@ -76,7 +76,7 @@ if (sum(divergences) > 0) {
 y_rep <- fit$draws("y_rep", format = "matrix")
 ppc <- ppc_dens_overlay(data$Log_Returns, y_rep)
 print(ppc)
-ggsave("3.2.arch_posterior_predictive_check_stupid_priors.png", plot = ppc)
+ggsave("3.3.arch_posterior_predictive_check_stupid_priors.png", plot = ppc)
 
 # Prior Sensitivity Analysis
 priors <- list(c(100, 1000), c(0, 10), c(-1, 2))  # Reflects stupid priors
@@ -94,7 +94,7 @@ prior_plot <- ggplot(df, aes(x = x, y = density, color = prior)) +
   geom_line(size = 1) +
   labs(title = "Density Plots for Stupid Priors", x = expression(theta), y = "Density") +
   theme_minimal()
-ggsave("3.2.stupid_prior_density_plots.png", plot = prior_plot)
+ggsave("3.3.stupid_prior_density_plots.png", plot = prior_plot)
 
 # LOO-CV for Model Comparison
 log_lik <- fit$draws("log_lik", format = "matrix")
