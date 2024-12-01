@@ -31,7 +31,15 @@ model {
   mu ~ normal(0, 0.2);             // Small mean, reflecting the assumption that returns hover near zero
   alpha0 ~ lognormal(-2, 0.5);     // Lognormal ensures positivity, with a small mean and moderate uncertainty
   alpha1 ~ beta(2, 8);             // Slightly stronger belief that alpha1 is close to zero
-  beta1 ~ beta(5, 2);              // Informative prior for GARCH term ********
+  // beta1 ~ beta(5, 2);              // Informative prior for GARCH term ********
+
+  beta1 ~ beta(10, 2);  // Stronger belief in high persistence
+  // beta1 ~ beta(2, 10);  // Skewed towards lower values
+  // beta1 ~ beta(5, 5);  // Symmetric prior, allowing for moderate persistence
+  // beta1 ~ normal(0.8, 0.1);  // Centered at 0.8 with moderate uncertainty
+
+
+
 
   // Likelihood
   for (n in 1:N) {

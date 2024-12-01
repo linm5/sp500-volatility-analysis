@@ -14,7 +14,7 @@ parameters {
 
 transformed parameters {
   vector[N] volatility;        // Conditional variances
-  
+
   // Initialize the first conditional variance
   volatility[1] = alpha0 / (1.0 - alpha1 - beta1);  // Stationary assumption
   volatility[1] = sqrt(fmax(volatility[1], 1e-8));  // Ensure positivity
@@ -27,24 +27,19 @@ transformed parameters {
 }
 
 model {
+  // Exaggerated and nonsensical priors
+  mu ~ uniform(-1000, 1000);          // Extremely wide prior for mean
+  alpha0 ~ normal(100, 50);           // Unrealistically large base volatility
+  alpha1 ~ beta(50, 0.5);             // Strong bias toward values near 1
+  // beta1 ~ beta(0.5, 50);              // Strong bias toward values near 0
 
-  // Priors
-  // INFORMATIVE PRIORS - CORRECT ONES DON'T DELETE:
-  // mu ~ normal(prior_mean_mu, 1.5 * prior_sd_mu); // Informative prior for mean
-  // alpha0 ~ normal(0.1, 0.05);             // Base volatility prior/weakly informative prior
-  // alpha1 ~ beta(2, 5);                    // ARCH parameter prior/ informative prior
-  // https://www.shs-conferences.org/articles/shsconf/pdf/2023/18/shsconf_fems2023_01077.pdf
-  // Scale parameter error can be ignored!
+  beta1 ~ lognormal(-5, 0.5); // Lognormal with Extreme Concentration Near Zero
+  // Use a lognormal prior to heavily skew the distribution:
 
-  mu ~ normal(prior_mean_mu, 1.5 * prior_sd_mu);                // Informative prior for mean
-  alpha0 ~ normal(0.1, 0.05);       // Weakly informative prior
-  alpha1 ~ beta(2, 5);              // Informative prior for ARCH term
-  beta1 ~ beta(5, 2);               // Informative prior for GARCH term
-  
+
   // Likelihood
   for (n in 1:N) {
     y[n] ~ normal(mu, volatility[n]);
-    target += normal_lpdf(y[n] | mu, volatility[n]);
   }
 }
 

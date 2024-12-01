@@ -62,3 +62,5 @@ generated quantities {
     log_lik[n] = normal_lpdf(y[n] | mu, volatility[n]);
   }
 }
+
+
