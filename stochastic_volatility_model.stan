@@ -23,14 +23,12 @@ model {
     // Priors
     // INFORMATIVE PRIORS - CORRECT ONES DON'T DELETE:
     // mu ~ normal(prior_sd_log_return, 0.05);   // Informative prior for mean
-    // phi ~ normal(0.75, 0.1);;                            // Base volatility prior/weakly informative prior
-    // sigma_vol ~ cauchy(0, 0.25);                       // Volatiltiy of volatility parameter prior/ informative prior
-    // https://www.shs-conferences.org/articles/shsconf/pdf/2023/18/shsconf_fems2023_01077.pdf
-    // Scale parameter error can be ignored!
+    // phi ~ normal(0.5, 0.1);;                            // Base volatility prior/weakly informative prior
+    // sigma_vol ~ cauchy(0, 0.1);                       // Volatiltiy of volatility parameter prior/ informative prior
      
     mu ~ normal(prior_sd_log_return, 0.025); // informative prior selection for mean log volatility
     phi ~ normal(0.5, 0.1);        // Prior for persistence coefficient
-    sigma_vol ~ cauchy(0, 0.1);    // Half-Normal prior for volatility of volatility
+    sigma_vol ~ cauchy(0, 0.1);    // Half-cauchy prior for volatility of volatility
     
     // AR(1) process for log-volatilities
     h[1] ~ normal(mu, sigma_vol / sqrt(1 - phi * phi));
