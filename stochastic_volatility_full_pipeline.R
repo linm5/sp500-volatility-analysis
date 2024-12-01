@@ -50,8 +50,8 @@ log_return_sd <- sd(data$Log_Returns, na.rm = TRUE)
 stan_data <- list(
   N = nrow(data),
   y = data$Log_Returns,
-  prior_mean_mu = log_return_mean,
-prior_sd_mu = log_return_sd
+  prior_mean_log_return = log_return_mean,
+  prior_sd_log_return = log_return_sd
 )
 
 # Compile Stan Model
@@ -118,7 +118,7 @@ prior_posterior_plot <- ggplot(df, aes(x = x, y = density, color = distribution)
   facet_wrap(~ prior, scales = "fixed", nrow = 3) +
   labs(title = "Prior and Posterior Densities", x = expression(theta), y = "Density") +
   theme_minimal()
-ggsave("stochastic_volatility_prior_posterior_sensitivity.png", prior_posterior_plot)
+# ggsave("stochastic_volatility_prior_posterior_sensitivity.png", prior_posterior_plot)
 
 # LOO-CV for Model Comparison
 log_lik <- fit$draws("log_lik", format = "matrix")

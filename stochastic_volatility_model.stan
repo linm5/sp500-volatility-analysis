@@ -1,8 +1,8 @@
 data {
     int<lower=1> N;          // Number of observations
     vector[N] y;             // Observed log-returns
-    real prior_mean_mu; // Mean of our daily returns, we use this for building informative prior
-    real<lower=0> prior_sd_mu; // Standard deviation of our daily returns, we use this for building informative prior
+    real prior_mean_log_return; // Mean of our daily returns, we use this for meaningful sampling for daily log-returns
+    real<lower=0> prior_sd_log_return; // Standard deviation of our daily returns (volatility), we use this for building informative prior
 }
 
 parameters {
@@ -22,15 +22,13 @@ transformed parameters {
 model {
     // Priors
     // INFORMATIVE PRIORS - CORRECT ONES DON'T DELETE:
-    // mu ~ normal(prior_mean_mu, 1.5 * prior_sd_mu);   // Informative prior for mean
-    // phi ~ normal(0.75, 0.1);;                            // Base volatility prior/weakly informative prior
-    // sigma_vol ~ cauchy(0, 0.25);                       // ARCH parameter prior/ informative prior
-    // https://www.shs-conferences.org/articles/shsconf/pdf/2023/18/shsconf_fems2023_01077.pdf
-    // Scale parameter error can be ignored!
+    // mu ~ normal(prior_sd_log_return, 0.025);   // Informative prior for mean
+    // phi ~ normal(0.5, 0.1);;                            // Base volatility prior/weakly informative prior
+    // sigma_vol ~ cauchy(0, 0.1);                       // Volatiltiy of volatility parameter prior/ informative prior
      
-    mu ~ normal(prior_mean_mu, 1.5 * prior_sd_mu); // informative prior selection for mean return
-    phi ~ normal(0.75, 0.1);        // Prior for AR1 coefficient
-    sigma_vol ~ cauchy(0, 0.25);    // Half-Normal prior for volatility of volatility
+    mu ~ normal(prior_sd_log_return, 0.025); // informative prior selection for mean log volatility
+    phi ~ normal(0.5, 0.1);        // Prior for persistence coefficient
+    sigma_vol ~ cauchy(0, 0.1);    // Half-cauchy prior for volatility of volatility
     
     // AR(1) process for log-volatilities
     h[1] ~ normal(mu, sigma_vol / sqrt(1 - phi * phi));
@@ -41,7 +39,7 @@ model {
     
     // Estimated returns on time t
     for (t in 1:N){
-        y[t] ~ normal(0, exp(h[t] / 2));
+        y[t] ~ normal(prior_mean_log_return, exp(h[t] / 2));
     }
 }
 
@@ -51,7 +49,7 @@ generated quantities {
 
     // Generate predictive samples
     for (t in 1:N) {
-        y_rep[t] = normal_rng(mu, exp(h[t] / 2));
+        y_rep[t] = normal_rng(prior_mean_log_return, exp(h[t] / 2));
         log_lik[t] = normal_lpdf(y[t] | mu,  exp(h[t] / 2));
     }
 }
