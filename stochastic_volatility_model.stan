@@ -22,7 +22,7 @@ transformed parameters {
 model {
     // Priors
     // INFORMATIVE PRIORS - CORRECT ONES DON'T DELETE:
-    // mu ~ normal(prior_sd_log_return, 0.05);   // Informative prior for mean
+    // mu ~ normal(prior_sd_log_return, 0.025);   // Informative prior for mean
     // phi ~ normal(0.5, 0.1);;                            // Base volatility prior/weakly informative prior
     // sigma_vol ~ cauchy(0, 0.1);                       // Volatiltiy of volatility parameter prior/ informative prior
      
