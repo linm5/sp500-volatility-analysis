@@ -18,7 +18,7 @@ library(loo)
 
 # Ensure CmdStan is installed
 cmdstan_installed <- function() {
-  res <- try(out <- cmdstanr::cmdstan_path(), silent = TRUE)
+  res <- try(out <- cmdstanr::cmdstan_path(), silent = TRUE) # nolint
   !inherits(res, "try-error")
 }
 if (!cmdstan_installed()) install_cmdstan()
@@ -41,7 +41,7 @@ stan_data <- list(
 )
 
 # Compile Stan Model
-arch_model <- cmdstan_model("../BDA_project/1.2.arch_priors2.stan", force_recompile = TRUE, quiet = FALSE)
+arch_model <- cmdstan_model("../models/arch_model.stan", force_recompile = TRUE, quiet = FALSE)
 
 # Explanation of MCMC options
 cat("MCMC Inference:\n")
@@ -79,30 +79,18 @@ if (sum(divergences) > 0) {
 y_rep <- fit$draws("y_rep", format = "matrix")
 ppc <- ppc_dens_overlay(data$Log_Returns, y_rep)
 print(ppc)
-ggsave("3.2.arch_posterior_predictive_check_priors2.png", plot = ppc)
 
-# Prior Sensitivity Analysis
-priors <- list(c(2, 2), c(5, 5), c(10, 1))
-densities_list <- lapply(priors, function(prior) {
-  alpha_prior <- prior[1]
-  beta_prior <- prior[2]
-  alpha_posterior <- alpha_prior + 60
-  beta_posterior <- beta_prior + 40
-  data.frame(
-    x = rep(seq(0, 1, length.out = 100), 2),
-    density = c(dbeta(seq(0, 1, length.out = 100), alpha_prior, beta_prior),
-                dbeta(seq(0, 1, length.out = 100), alpha_posterior, beta_posterior)),
-    distribution = factor(rep(c("Prior", "Posterior"), each = 100)),
-    prior = paste("Alpha =", alpha_prior, "Beta =", beta_prior)
-  )
-})
-df <- do.call(rbind, densities_list)
-prior_posterior_plot <- ggplot(df, aes(x = x, y = density, color = distribution)) +
-  geom_line(size = 1) +
-  facet_wrap(~ prior, scales = "fixed", nrow = 3) +
-  labs(title = "Prior and Posterior Densities", x = expression(theta), y = "Density") +
-  theme_minimal()
-# ggsave("3.ARCH_prior_posterior_sensitivity.png", prior_posterior_plot)
+# Original Priors / Model:
+ggsave("../graphics/arch_posterior_predictive_check_original.png", plot = ppc)
+
+# Alternative Priors 1:
+# ggsave("../graphics/arch_posterior_predictive_check_alternativepriors1.png", plot = ppc)
+
+# Alternative Priors 2:
+# ggsave("../graphics/arch_posterior_predictive_check_alternativepriors2.png", plot = ppc)
+
+# Dummy Priors:
+# ggsave("../graphics/arch_posterior_predictive_check_dummy_priors.png", plot = ppc)
 
 # LOO-CV for Model Comparison
 log_lik <- fit$draws("log_lik", format = "matrix")

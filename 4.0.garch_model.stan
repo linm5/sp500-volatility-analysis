@@ -30,16 +30,24 @@ model {
 
   // Priors
   // INFORMATIVE PRIORS - CORRECT ONES DON'T DELETE:
-  // mu ~ normal(prior_mean_mu, 1.5 * prior_sd_mu); // Informative prior for mean
-  // alpha0 ~ normal(0.1, 0.05);             // Base volatility prior/weakly informative prior
-  // alpha1 ~ beta(2, 5);                    // ARCH parameter prior/ informative prior
+  mu ~ normal(prior_mean_mu, 1.5 * prior_sd_mu); // Informative prior for mean
+  alpha0 ~ normal(0.1, 0.05);             // Base volatility prior/weakly informative prior
+  alpha1 ~ beta(2, 5);                    // ARCH parameter prior/ informative prior
+  beta1 ~ beta(5, 2);               // Informative prior for GARCH term
   // https://www.shs-conferences.org/articles/shsconf/pdf/2023/18/shsconf_fems2023_01077.pdf
   // Scale parameter error can be ignored!
+  
+  // Priors based on financial theory - Alternative Priors 1:
+  // mu ~ normal(0, 0.2);             // Small mean, reflecting the assumption that returns hover near zero
+  // alpha0 ~ lognormal(-2, 0.5);     // Lognormal ensures positivity, with a small mean and moderate uncertainty
+  // alpha1 ~ beta(2, 8);             // Slightly stronger belief that alpha1 is close to zero
+  // beta1 ~ beta(5, 2);              // Informative prior for GARCH term
 
-  mu ~ normal(prior_mean_mu, 1.5 * prior_sd_mu);                // Informative prior for mean
-  alpha0 ~ normal(0.1, 0.05);       // Weakly informative prior
-  alpha1 ~ beta(2, 5);              // Informative prior for ARCH term
-  beta1 ~ beta(5, 2);               // Informative prior for GARCH term
+  // Priors informed by empirical studies - Alternative Priors 2:
+  // mu ~ student_t(3, 0, 0.5);         // Heavy-tailed prior centered at 0 for robustness
+  // alpha0 ~ normal(0.2, 0.1);         // Base volatility with a mean around 0.2 and moderate uncertainty
+  // alpha1 ~ uniform(0, 1);            // Weakly informative prior for ARCH term
+  // beta1 ~ uniform(0, 1);             // Weakly informative prior for GARCH term
   
   // Likelihood
   for (n in 1:N) {
