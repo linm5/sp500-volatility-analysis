@@ -37,7 +37,7 @@ cmdstan_installed <- function() {
 if (!cmdstan_installed()) install_cmdstan()
 
 # Load Data
-data <- read.csv("cleaned_s&p_500_data.csv")
+data <- read.csv("../data/cleaned_s&p_500_data.csv")
 
 # Check for missing or invalid data
 if (any(is.na(data$Log_Returns))) stop("Missing values detected in Log_Returns")
@@ -55,7 +55,9 @@ stan_data <- list(
 )
 
 # Compile Stan Model
-garch_model <- cmdstan_model("../BDA_project/4.1.garch_model.stan", force_recompile = TRUE, quiet = FALSE)
+garch_model <- cmdstan_model("../BDA_project/4.0.garch_model_DONE.stan", force_recompile = TRUE, quiet = FALSE)
+
+
 
 # Explanation of MCMC options
 cat("MCMC Inference:\n")
@@ -93,32 +95,18 @@ if (sum(divergences) > 0) {
 y_rep <- fit$draws("y_rep", format = "matrix")
 ppc <- ppc_dens_overlay(data$Log_Returns, y_rep)
 print(ppc)
-ggsave("6.1.garch_posterior_predictive_check_original.png", plot = ppc)
+# Original Priors / Model:
+ggsave("../graphics/garch_posterior_predictive_check_original.png", plot = ppc)
 
-# Prior Sensitivity Analysis
-priors <- list(
-  c(2, 2), c(5, 5), c(10, 1) # Example prior distributions for sensitivity analysis
-)
-densities_list <- lapply(priors, function(prior) {
-  alpha_prior <- prior[1]
-  beta_prior <- prior[2]
-  alpha_posterior <- alpha_prior + 60  # Replace with your actual posterior parameters
-  beta_posterior <- beta_prior + 40   # Replace with your actual posterior parameters
-  data.frame(
-    x = rep(seq(0, 1, length.out = 100), 2),
-    density = c(dbeta(seq(0, 1, length.out = 100), alpha_prior, beta_prior),
-                dbeta(seq(0, 1, length.out = 100), alpha_posterior, beta_posterior)),
-    distribution = factor(rep(c("Prior", "Posterior"), each = 100)),
-    prior = paste("Alpha =", alpha_prior, "Beta =", beta_prior)
-  )
-})
-df <- do.call(rbind, densities_list)
-prior_posterior_plot <- ggplot(df, aes(x = x, y = density, color = distribution)) +
-  geom_line(size = 1) +
-  facet_wrap(~ prior, scales = "fixed", nrow = 3) +
-  labs(title = "Prior and Posterior Densities", x = expression(theta), y = "Density") +
-  theme_minimal()
-# ggsave("6.GARCH_prior_posterior_sensitivity.png", prior_posterior_plot)
+# Alternative Priors 1:
+# ggsave("../graphics/garch_posterior_predictive_check_alternativepriors1.png", plot = ppc)
+
+# Alternative Priors 2:
+# ggsave("../graphics/garch_posterior_predictive_check_alternativepriors2.png", plot = ppc)
+
+# Dummy Priors:
+# ggsave("../graphics/garch_posterior_predictive_check_dummy_priors.png", plot = ppc)
+
 
 # LOO-CV for Model Comparison -> this still need to be modified. 
 log_lik <- fit$draws("log_lik", format = "matrix")

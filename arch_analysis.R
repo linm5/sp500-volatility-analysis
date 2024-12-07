@@ -1,12 +1,4 @@
 # Required Libraries
-
-# Step 1: Create user library directory
-dir.create(path = "~/R/library", recursive = TRUE, showWarnings = FALSE)
-
-# Step 2: Set user library path
-.libPaths(c("~/R/library", .libPaths()))
-
-
 if (!require(tidybayes)) install.packages("tidybayes")
 library(tidybayes)
 
@@ -24,20 +16,15 @@ library(bayesplot)
 if (!require(loo)) install.packages("loo")
 library(loo)
 
-if (!require(stringi)) {
-  install.packages("stringi", lib = "~/R/library", repos = "https://cran.rstudio.com/")
-}
-library(stringi)
-
 # Ensure CmdStan is installed
 cmdstan_installed <- function() {
-  res <- try(out <- cmdstanr::cmdstan_path(), silent = TRUE)
+  res <- try(out <- cmdstanr::cmdstan_path(), silent = TRUE) # nolint
   !inherits(res, "try-error")
 }
 if (!cmdstan_installed()) install_cmdstan()
 
 # Load Data
-data <- read.csv("cleaned_s&p_500_data.csv")
+data <- read.csv("../data/cleaned_s&p_500_data.csv")
 
 # Check for missing or invalid data
 if (any(is.na(data$Log_Returns))) stop("Missing values detected in Log_Returns")
@@ -46,16 +33,15 @@ if (any(is.na(data$Log_Returns))) stop("Missing values detected in Log_Returns")
 log_return_mean <- mean(data$Log_Returns, na.rm = TRUE)
 log_return_sd <- sd(data$Log_Returns, na.rm = TRUE)
 
-# Prepare Data for GARCH Model
 stan_data <- list(
-  N = nrow(data),
+  T = nrow(data),
   y = data$Log_Returns,
   prior_mean_mu = log_return_mean,
   prior_sd_mu = log_return_sd
 )
 
 # Compile Stan Model
-garch_model <- cmdstan_model("../BDA_project/4.3.garch_model.stan", force_recompile = TRUE, quiet = FALSE)
+arch_model <- cmdstan_model("../models/arch_model.stan", force_recompile = TRUE, quiet = FALSE)
 
 # Explanation of MCMC options
 cat("MCMC Inference:\n")
@@ -63,7 +49,7 @@ cat("- The model was run with 4 chains, each with 1000 warmup iterations and 200
 cat("- A seed value (4911) was used for reproducibility.\n")
 
 # Fit the model
-fit <- garch_model$sample(
+fit <- arch_model$sample(
   data = stan_data,
   seed = 4911,
   chains = 4,
@@ -93,34 +79,20 @@ if (sum(divergences) > 0) {
 y_rep <- fit$draws("y_rep", format = "matrix")
 ppc <- ppc_dens_overlay(data$Log_Returns, y_rep)
 print(ppc)
-ggsave("6.3.garch_posterior_predictive_check_original.png", plot = ppc)
 
-# Prior Sensitivity Analysis
-priors <- list(
-  c(2, 2), c(5, 5), c(10, 1) # Example prior distributions for sensitivity analysis
-)
-densities_list <- lapply(priors, function(prior) {
-  alpha_prior <- prior[1]
-  beta_prior <- prior[2]
-  alpha_posterior <- alpha_prior + 60  # Replace with your actual posterior parameters
-  beta_posterior <- beta_prior + 40   # Replace with your actual posterior parameters
-  data.frame(
-    x = rep(seq(0, 1, length.out = 100), 2),
-    density = c(dbeta(seq(0, 1, length.out = 100), alpha_prior, beta_prior),
-                dbeta(seq(0, 1, length.out = 100), alpha_posterior, beta_posterior)),
-    distribution = factor(rep(c("Prior", "Posterior"), each = 100)),
-    prior = paste("Alpha =", alpha_prior, "Beta =", beta_prior)
-  )
-})
-df <- do.call(rbind, densities_list)
-prior_posterior_plot <- ggplot(df, aes(x = x, y = density, color = distribution)) +
-  geom_line(size = 1) +
-  facet_wrap(~ prior, scales = "fixed", nrow = 3) +
-  labs(title = "Prior and Posterior Densities", x = expression(theta), y = "Density") +
-  theme_minimal()
-# ggsave("6.GARCH_prior_posterior_sensitivity.png", prior_posterior_plot)
+# Original Priors / Model:
+ggsave("../graphics/arch_posterior_predictive_check_original.png", plot = ppc)
 
-# LOO-CV for Model Comparison -> this still need to be modified. 
+# Alternative Priors 1:
+# ggsave("../graphics/arch_posterior_predictive_check_alternativepriors1.png", plot = ppc)
+
+# Alternative Priors 2:
+# ggsave("../graphics/arch_posterior_predictive_check_alternativepriors2.png", plot = ppc)
+
+# Dummy Priors:
+# ggsave("../graphics/arch_posterior_predictive_check_dummy_priors.png", plot = ppc)
+
+# LOO-CV for Model Comparison
 log_lik <- fit$draws("log_lik", format = "matrix")
 loo_result <- loo(log_lik)
 cat("LOO-CV Result:\n")
