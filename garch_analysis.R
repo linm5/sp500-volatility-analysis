@@ -96,16 +96,16 @@ y_rep <- fit$draws("y_rep", format = "matrix")
 ppc <- ppc_dens_overlay(data$Log_Returns, y_rep)
 print(ppc)
 # Original Priors / Model:
-ggsave("../graphics/garch_posterior_predictive_check_original.png", plot = ppc)
+ggsave("../graphics/garch_ppc_original.png", plot = ppc)
 
 # Alternative Priors 1:
-# ggsave("../graphics/garch_posterior_predictive_check_alternativepriors1.png", plot = ppc)
+# ggsave("../graphics/garch_ppc_alternativepriors1.png", plot = ppc)
 
 # Alternative Priors 2:
-# ggsave("../graphics/garch_posterior_predictive_check_alternativepriors2.png", plot = ppc)
+# ggsave("../graphics/garch_ppc_alternativepriors2.png", plot = ppc)
 
 # Dummy Priors:
-# ggsave("../graphics/garch_posterior_predictive_check_dummy_priors.png", plot = ppc)
+# ggsave("../graphics/garch_ppc_dummy_priors.png", plot = ppc)
 
 
 # LOO-CV for Model Comparison -> this still need to be modified. 

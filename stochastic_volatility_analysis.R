@@ -55,7 +55,7 @@ stan_data <- list(
 )
 
 # Compile Stan Model
-stochastic_volatility_model <- cmdstan_model("../BDA_project/stochastic_volatility_model.stan", force_recompile = TRUE, quiet = FALSE)
+stochastic_volatility_model <- cmdstan_model("../model/stochastic_volatility_model.stan", force_recompile = TRUE, quiet = FALSE)
 
 # Explanation of MCMC options
 cat("MCMC Inference:\n")
@@ -93,7 +93,48 @@ if (sum(divergences) > 0) {
 y_rep <- fit$draws("y_rep", format = "matrix")
 ppc <- ppc_dens_overlay(data$Log_Returns, y_rep)
 print(ppc)
-ggsave("stochastic_volatility_posterior_predictive_check.png", plot = ppc)
+ggsave("../graphics/stochastic_volatility_ppc.png", plot = ppc)
+
+# Dummy Priors:
+# ggsave("../graphics/stochastic_volatility_ppc_dummy_priors.png", plot = ppc)
+
+# Compare Prior vs Posterior for phi
+# posterior_samples <- as_draws_df(fit$draws())
+
+# Define dummy prior for phi
+# phi_prior <- data.frame(
+#  x = seq(-10, 10, length.out = 500),
+#  density = dunif(seq(-10, 10, length.out = 500), -10, 10)
+# )
+
+# Posterior for phi
+# phi_posterior <- posterior_samples %>% select(phi)
+
+# Plot Prior vs Posterior for phi
+#ggplot() +
+#  geom_line(data = phi_prior, aes(x = x, y = density), color = "red", linetype = "dashed", size = 1) +
+#  geom_density(data = phi_posterior, aes(x = phi), fill = "blue", alpha = 0.3) +
+#  labs(title = "Prior vs Posterior for phi", x = "phi", y = "Density") +
+#  theme_minimal() +
+#  ggsave("phi_prior_vs_posterior.png")
+
+# Compare Prior vs Posterior for sigma_vol
+# Define dummy prior for sigma_vol
+#sigma_vol_prior <- data.frame(
+#  x = seq(0, 5, length.out = 500),
+#  density = dgamma(seq(0, 5, length.out = 500), shape = 0.01, rate = 0.01)
+#)
+
+# Posterior for sigma_vol
+#sigma_vol_posterior <- posterior_samples %>% select(sigma_vol)
+
+# Plot Prior vs Posterior for sigma_vol
+#ggplot() +
+#  geom_line(data = sigma_vol_prior, aes(x = x, y = density), color = "red", linetype = "dashed", size = 1) +
+#  geom_density(data = sigma_vol_posterior, aes(x = sigma_vol), fill = "blue", alpha = 0.3) +
+#  labs(title = "Prior vs Posterior for sigma_vol", x = "sigma_vol", y = "Density") +
+#  theme_minimal() +
+#  ggsave("sigma_vol_prior_vs_posterior.png")
 
 # LOO-CV for Model Comparison
 log_lik <- fit$draws("log_lik", format = "matrix")
