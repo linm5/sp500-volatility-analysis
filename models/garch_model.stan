@@ -41,7 +41,7 @@ model {
   // mu ~ normal(0, 0.2);             // Small mean, reflecting the assumption that returns hover near zero
   // alpha0 ~ lognormal(-2, 0.5);     // Lognormal ensures positivity, with a small mean and moderate uncertainty
   // alpha1 ~ beta(2, 8);             // Slightly stronger belief that alpha1 is close to zero
-  // beta1 ~ beta(5, 2);              // Informative prior for GARCH term
+  // beta1 ~ beta(10, 2);             // Stronger belief in high persistence
 
   // Priors informed by empirical studies - Alternative Priors 2:
   // mu ~ student_t(3, 0, 0.5);         // Heavy-tailed prior centered at 0 for robustness

@@ -24,7 +24,7 @@ cmdstan_installed <- function() {
 if (!cmdstan_installed()) install_cmdstan()
 
 # Load Data
-data <- read.csv("cleaned_s&p_500_data.csv")
+data <- read.csv("../data/cleaned_s&p_500_data.csv")
 
 # Check for missing or invalid data
 if (any(is.na(data$Log_Returns))) stop("Missing values detected in Log_Returns")
