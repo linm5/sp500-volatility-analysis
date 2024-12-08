@@ -21,6 +21,9 @@ if (!require(cmdstanr)) {
 if (!require(bayesplot)) install.packages("bayesplot")
 library(bayesplot)
 
+if (!require(rstantools)) install.packages("rstantools", repos = c("https://mc-stan.org/rstantools/"), getOption("repos"))
+library(rstantools)
+
 if (!require(loo)) install.packages("loo")
 library(loo)
 
@@ -36,8 +39,11 @@ cmdstan_installed <- function() {
 }
 if (!cmdstan_installed()) install_cmdstan()
 
+# Making sure plot texts are adequetly sized
+theme_set(bayesplot::theme_default(base_family = "sans", base_size = 20))
+
 # Load Data
-data <- read.csv("../data/cleaned_s&p_500_data.csv")
+data <- read.csv("data/cleaned_s&p_500_data.csv")
 
 # Check for missing or invalid data
 if (any(is.na(data$Log_Returns))) stop("Missing values detected in Log_Returns")
@@ -55,7 +61,7 @@ stan_data <- list(
 )
 
 # Compile Stan Model
-garch_model <- cmdstan_model("../BDA_project/4.0.garch_model_DONE.stan", force_recompile = TRUE, quiet = FALSE)
+garch_model <- cmdstan_model("models/garch_model.stan", force_recompile = TRUE, quiet = FALSE)
 
 
 
@@ -96,20 +102,24 @@ y_rep <- fit$draws("y_rep", format = "matrix")
 ppc <- ppc_dens_overlay(data$Log_Returns, y_rep)
 print(ppc)
 # Original Priors / Model:
-ggsave("../graphics/garch_ppc_original.png", plot = ppc)
+ggsave("graphics/garch_ppc_original.png", plot = ppc)
 
 # Alternative Priors 1:
-# ggsave("../graphics/garch_ppc_alternativepriors1.png", plot = ppc)
+# ggsave("graphics/garch_ppc_alternativepriors1.png", plot = ppc)
 
 # Alternative Priors 2:
-# ggsave("../graphics/garch_ppc_alternativepriors2.png", plot = ppc)
+# ggsave("graphics/garch_ppc_alternativepriors2.png", plot = ppc)
 
 # Dummy Priors:
-# ggsave("../graphics/garch_ppc_dummy_priors.png", plot = ppc)
+# ggsave("graphics/garch_ppc_dummy_priors.png", plot = ppc)
 
 
 # LOO-CV for Model Comparison -> this still need to be modified. 
 log_lik <- fit$draws("log_lik", format = "matrix")
-loo_result <- loo(log_lik)
+loo_result <- loo(log_lik, save_psis = TRUE)
 cat("LOO-CV Result:\n")
 print(loo_result)
+
+# Drawing LOO-PIT
+loo_pit <- bayesplot::ppc_loo_pit_qq(y = data$Log_Returns, yrep = y_rep, psis_object = loo_result$psis_object)
+ggsave("graphics/garch_loo_pit.png", plot = loo_pit)

@@ -20,6 +20,9 @@ if (!require(cmdstanr)) {
 if (!require(bayesplot)) install.packages("bayesplot")
 library(bayesplot)
 
+if (!require(rstantools)) install.packages("rstantools", repos = c("https://mc-stan.org/rstantools/"), getOption("repos"))
+library(rstantools)
+
 if (!require(loo)) install.packages("loo")
 library(loo)
 
@@ -36,8 +39,11 @@ cmdstan_installed <- function() {
 }
 if (!cmdstan_installed()) install_cmdstan()
 
+# Making sure plot texts are adequetly sized
+theme_set(bayesplot::theme_default(base_family = "sans", base_size = 20))
+
 # Load Data
-data <- read.csv("../data/cleaned_s&p_500_data.csv")
+data <- read.csv("data/cleaned_s&p_500_data.csv")
 
 # Check for missing or invalid data
 if (any(is.na(data$Log_Returns))) stop("Missing values detected in Log_Returns")
@@ -55,7 +61,7 @@ stan_data <- list(
 )
 
 # Compile Stan Model
-stochastic_volatility_model <- cmdstan_model("../model/stochastic_volatility_model.stan", force_recompile = TRUE, quiet = FALSE)
+stochastic_volatility_model <- cmdstan_model("models/stochastic_volatility_model.stan", force_recompile = TRUE, quiet = FALSE)
 
 # Explanation of MCMC options
 cat("MCMC Inference:\n")
@@ -93,10 +99,10 @@ if (sum(divergences) > 0) {
 y_rep <- fit$draws("y_rep", format = "matrix")
 ppc <- ppc_dens_overlay(data$Log_Returns, y_rep)
 print(ppc)
-ggsave("../graphics/stochastic_volatility_ppc.png", plot = ppc)
+ggsave("graphics/stochastic_volatility_ppc.png", plot = ppc)
 
 # Dummy Priors:
-# ggsave("../graphics/stochastic_volatility_ppc_dummy_priors.png", plot = ppc)
+# ggsave("graphics/stochastic_volatility_ppc_dummy_priors.png", plot = ppc)
 
 # Compare Prior vs Posterior for phi
 # posterior_samples <- as_draws_df(fit$draws())
@@ -138,6 +144,10 @@ ggsave("../graphics/stochastic_volatility_ppc.png", plot = ppc)
 
 # LOO-CV for Model Comparison
 log_lik <- fit$draws("log_lik", format = "matrix")
-loo_result <- loo(log_lik)
+loo_result <- loo(log_lik, save_psis = TRUE)
 cat("LOO-CV Result:\n")
 print(loo_result)
+
+# Drawing LOO-PIT
+loo_pit <- bayesplot::ppc_loo_pit_qq(y = data$Log_Returns, yrep = y_rep, psis_object = loo_result$psis_object)
+ggsave("graphics/sv_loo_pit.png", plot = loo_pit)
