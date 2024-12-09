@@ -34,12 +34,12 @@ model {
   alpha1 ~ uniform(0, 1);          // Weakly informative prior, allowing exploration of the entire valid range
 
   // Dummy priors
-  // mu ~ normal(100, 1000);      // Implausibly large prior for mean return
-  // alpha0 ~ normal(0, 10);      // Allows negative values, invalid for volatility
-  // alpha1 ~ uniform(-1, 2);     // Invalid range for ARCH parameter
+  //mu ~ normal(100, 1000);      // Implausibly large prior for mean return
+  //alpha0 ~ normal(0, 10);      // Allows negative values, invalid for volatility
+  //alpha1 ~ uniform(-1, 2);     // Invalid range for ARCH parameter
   
   // ARCH(1) model
-  h[1] = alpha0 / (1 - alpha1); // Stationary variance initialization
+  h[1] = fmax(alpha0 / (1 - alpha1), 1e-8); // Stationary variance initialization
   for (t in 2:T) {
     h[t] = fmax(alpha0 + alpha1 * square(y[t-1] - mu), 1e-8); // Ensure positivity
   }

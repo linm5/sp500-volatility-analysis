@@ -39,7 +39,12 @@ cmdstan_installed <- function() {
 if (!cmdstan_installed()) install_cmdstan()
 
 # Making sure plot texts are adequetly sized
-theme_set(bayesplot::theme_default(base_family = "sans", base_size = 20))
+theme_set(bayesplot::theme_default(base_family = "sans", base_size = 24) +
+theme(
+    legend.text = element_text(size = 32),
+    legend.title = element_text(size = 36)
+  )
+)
 
 # Load Data
 data <- read.csv("data/cleaned_s&p_500_data.csv")
@@ -83,14 +88,14 @@ print(fit_summary)
 cat("Convergence Diagnostics Interpretation:\n")
 cat("- All R-hat values are close to 1.00, indicating proper chain mixing and convergence.\n")
 
-# Check for divergent transitions
+Check for divergent transitions
 diagnostics <- fit$diagnostic_summary()
 divergences <- diagnostics$divergent__
 cat("Number of Divergent Transitions:", sum(divergences), "\n")
 if (sum(divergences) > 0) {
-  cat("Warning: Divergent transitions detected. Consider increasing adapt_delta.\n")
+ cat("Warning: Divergent transitions detected. Consider increasing adapt_delta.\n")
 } else {
-  cat("No divergent transitions detected.\n")
+ cat("No divergent transitions detected.\n")
 }
 
 # Posterior Predictive Checks
@@ -102,13 +107,13 @@ print(ppc)
 # ggsave("graphics/arch_ppc_original.png", plot = ppc)
 
 # Alternative Priors 1:
-# ggsave("../graphics/arch_ppc_alternativepriors1.png", plot = ppc)
+#ggsave("graphics/arch_ppc_alternativepriors1.png", plot = ppc)
 
 # Alternative Priors 2:
-ggsave("/graphics/arch_ppc_alternativepriors2.png", plot = ppc)
+# ggsave("../graphics/arch_ppc_alternativepriors2.png", plot = ppc)
 
 # Dummy Priors:
-# ggsave("../graphics/arch_ppc_dummy_priors.png", plot = ppc)
+#ggsave("graphics/arch_ppc_dummy_priors.png", plot = ppc)
 
 # LOO-CV for Model Comparison
 log_lik <- fit$draws("log_lik", format = "matrix")

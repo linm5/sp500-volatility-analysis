@@ -40,7 +40,13 @@ cmdstan_installed <- function() {
 if (!cmdstan_installed()) install_cmdstan()
 
 # Making sure plot texts are adequetly sized
-theme_set(bayesplot::theme_default(base_family = "sans", base_size = 20))
+theme_set(bayesplot::theme_default(base_family = "sans", base_size = 24) +
+theme(
+    legend.text = element_text(size = 32),
+    legend.title = element_text(size = 36)
+  )
+)
+
 
 # Load Data
 data <- read.csv("data/cleaned_s&p_500_data.csv")
@@ -102,7 +108,7 @@ print(ppc)
 ggsave("graphics/stochastic_volatility_ppc.png", plot = ppc)
 
 # Dummy Priors:
-# ggsave("graphics/stochastic_volatility_ppc_dummy_priors.png", plot = ppc)
+#ggsave("graphics/stochastic_volatility_ppc_dummy_priors.png", plot = ppc)
 
 # Compare Prior vs Posterior for phi
 # posterior_samples <- as_draws_df(fit$draws())
