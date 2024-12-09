@@ -99,13 +99,13 @@ ppc <- ppc_dens_overlay(data$Log_Returns, y_rep)
 print(ppc)
 
 # Original Priors / Model:
-ggsave("graphics/arch_ppc_original.png", plot = ppc)
+# ggsave("graphics/arch_ppc_original.png", plot = ppc)
 
 # Alternative Priors 1:
 # ggsave("../graphics/arch_ppc_alternativepriors1.png", plot = ppc)
 
 # Alternative Priors 2:
-# ggsave("../graphics/arch_ppc_alternativepriors2.png", plot = ppc)
+ggsave("/graphics/arch_ppc_alternativepriors2.png", plot = ppc)
 
 # Dummy Priors:
 # ggsave("../graphics/arch_ppc_dummy_priors.png", plot = ppc)
