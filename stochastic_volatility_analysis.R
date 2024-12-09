@@ -85,30 +85,30 @@ fit <- stochastic_volatility_model$sample(
 )
 
 # Diagnostics
-# fit_summary <- fit$summary()
-# cat("Convergence Diagnostics:\n")
-# print(fit_summary)
-# cat("Convergence Diagnostics Interpretation:\n")
-# cat("- All R-hat values are close to 1.00, indicating proper chain mixing and convergence.\n")
+fit_summary <- fit$summary()
+cat("Convergence Diagnostics:\n")
+print(fit_summary)
+cat("Convergence Diagnostics Interpretation:\n")
+cat("- All R-hat values are close to 1.00, indicating proper chain mixing and convergence.\n")
 
-# # Check for divergent transitions
-# diagnostics <- fit$diagnostic_summary()
-# divergences <- diagnostics$divergent__
-# cat("Number of Divergent Transitions:", sum(divergences), "\n")
-# if (sum(divergences) > 0) {
-#   cat("Warning: Divergent transitions detected. Consider increasing adapt_delta.\n")
-# } else {
-#   cat("No divergent transitions detected.\n")
-# }
+# Check for divergent transitions
+diagnostics <- fit$diagnostic_summary()
+divergences <- diagnostics$divergent__
+cat("Number of Divergent Transitions:", sum(divergences), "\n")
+if (sum(divergences) > 0) {
+  cat("Warning: Divergent transitions detected. Consider increasing adapt_delta.\n")
+} else {
+  cat("No divergent transitions detected.\n")
+}
 
 # Posterior Predictive Checks
 y_rep <- fit$draws("y_rep", format = "matrix")
 ppc <- ppc_dens_overlay(data$Log_Returns, y_rep)
 print(ppc)
-# ggsave("graphics/stochastic_volatility_ppc.png", plot = ppc)
+ggsave("graphics/stochastic_volatility_ppc.png", plot = ppc)
 
 # Dummy Priors:
-ggsave("graphics/stochastic_volatility_ppc_dummy_priors.png", plot = ppc)
+#ggsave("graphics/stochastic_volatility_ppc_dummy_priors.png", plot = ppc)
 
 # Compare Prior vs Posterior for phi
 # posterior_samples <- as_draws_df(fit$draws())
@@ -148,12 +148,12 @@ ggsave("graphics/stochastic_volatility_ppc_dummy_priors.png", plot = ppc)
 #  theme_minimal() +
 #  ggsave("sigma_vol_prior_vs_posterior.png")
 
-# # LOO-CV for Model Comparison
-# log_lik <- fit$draws("log_lik", format = "matrix")
-# loo_result <- loo(log_lik, save_psis = TRUE)
-# cat("LOO-CV Result:\n")
-# print(loo_result)
+# LOO-CV for Model Comparison
+log_lik <- fit$draws("log_lik", format = "matrix")
+loo_result <- loo(log_lik, save_psis = TRUE)
+cat("LOO-CV Result:\n")
+print(loo_result)
 
-# # Drawing LOO-PIT
-# loo_pit <- bayesplot::ppc_loo_pit_qq(y = data$Log_Returns, yrep = y_rep, psis_object = loo_result$psis_object)
-# ggsave("graphics/sv_loo_pit.png", plot = loo_pit)
+# Drawing LOO-PIT
+loo_pit <- bayesplot::ppc_loo_pit_qq(y = data$Log_Returns, yrep = y_rep, psis_object = loo_result$psis_object)
+ggsave("graphics/sv_loo_pit.png", plot = loo_pit)
