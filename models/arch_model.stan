@@ -17,9 +17,9 @@ model {
   // Priors
 
   // INFORMATIVE PRIORS - Correct - Original Priors:
-  //mu ~ normal(prior_mean_mu, 1.5 * prior_sd_mu); // Informative prior for mean
-  //alpha0 ~ normal(0.1, 0.05);             // Base volatility prior/weakly informative prior
-  //alpha1 ~ beta(2, 5);                    // ARCH parameter prior/ informative prior
+  mu ~ normal(prior_mean_mu, 1.5 * prior_sd_mu); // Informative prior for mean
+  alpha0 ~ normal(0.1, 0.05);             // Base volatility prior/weakly informative prior
+  alpha1 ~ beta(2, 5);                    // ARCH parameter prior/ informative prior
   // https://www.shs-conferences.org/articles/shsconf/pdf/2023/18/shsconf_fems2023_01077.pdf
   // Scale parameter error can be ignored!
 
@@ -28,10 +28,10 @@ model {
   //alpha0 ~ lognormal(-2, 0.5);    // Lognormal ensures positivity, with a small mean and moderate uncertainty
   //alpha1 ~ beta(2, 8);            // Slightly stronger belief that alpha1 is close to zero
 
-  // Priors informed by empirical studies - Alternative priors 2:
-  mu ~ student_t(3, 0, 0.5);       // Heavy-tailed prior centered at 0, allowing for more uncertainty
-  alpha0 ~ normal(0.2, 0.1);       // Base volatility with a mean around 0.2 and wider uncertainty
-  alpha1 ~ uniform(0, 1);          // Weakly informative prior, allowing exploration of the entire valid range
+  //Priors informed by empirical studies - Alternative priors 2:
+  //mu ~ student_t(3, 0, 0.5);       // Heavy-tailed prior centered at 0, allowing for more uncertainty
+  //alpha0 ~ normal(0.2, 0.1);       // Base volatility with a mean around 0.2 and wider uncertainty
+  //alpha1 ~ uniform(0, 1);          // Weakly informative prior, allowing exploration of the entire valid range
 
   // Dummy priors
   //mu ~ normal(100, 1000);      // Implausibly large prior for mean return
