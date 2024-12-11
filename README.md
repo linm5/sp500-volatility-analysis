@@ -9,4 +9,4 @@ The initial challenge or problem for this project lies in determining whether re
 
 This project utilizes the following models: ARCH, GARCH, and stochastic volatility. These models are applied to capture volatility clustering in the S\&P 500 index data; Bayesian inference is used for parameter estimation, allowing us to incorporate prior knowledge and quantify the uncertainty in the model outputs. By applying these established techniques, we aim to provide insights into the dynamic behavior of market volatility.
 
-You can read the full report [here](report.pdf).
+You can read the full report [here](report.pdf) and check presentation slides [here](presentation.pdf).
